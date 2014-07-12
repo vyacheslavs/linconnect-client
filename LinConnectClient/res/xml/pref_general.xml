@@ -3,22 +3,22 @@
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_toggle"
-        android:title="Enable LinConnect" >
+        android:title="@string/pref_toggle" >
     </CheckBoxPreference>
 
     <PreferenceCategory android:title="Setup" >
         <Preference
             android:key="pref_download"
-            android:summary="Tap here to share the download URL"
-            android:title="Step 1: Download server on desktop" />
+            android:summary="@string/pref_download_summary"
+            android:title="@string/pref_download" />
         <Preference
             android:key="pref_enable"
-            android:summary="Tap here and select LinConnect"
-            android:title="Step 2: Enable notification service" />
+            android:summary="@string/pref_enable_summary"
+            android:title="@string/pref_enable" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="cat_servers"
-        android:title="Step 3: Select Server" >
+        android:title="@string/cat_servers" >
         <EditTextPreference
             android:defaultValue="0.0.0.0:9090"
             android:icon="@drawable/ic_checkmark"
@@ -26,7 +26,7 @@
             android:order="-1"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Custom IP address" />
+            android:title="@string/pref_ip" />
 
         <Preference
             android:key="pref_loading"
@@ -37,33 +37,33 @@
             android:icon="@drawable/ic_refresh"
             android:key="pref_refresh"
             android:order="999"
-            android:title="Refresh server list" >
+            android:title="@string/pref_refresh" >
         </Preference>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Configuration" >
+    <PreferenceCategory android:title="@string/configuration" >
         <Preference
             android:key="pref_application"
-            android:summary="Tap here to choose which applications can send notifications to the desktop (optional)"
-            android:title="Enabled applications" />
+            android:summary="@string/pref_application_summary"
+            android:title="@string/pref_application" />
         <Preference
             android:enabled="false"
-            android:summary="Additional options can be found in the server configuration file (conf.ini)"
-            android:title="Additional options" >
+            android:summary="@string/pref_additional_options_summary"
+            android:title="@string/pref_additional_options" >
         </Preference>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Information" >
+    <PreferenceCategory android:title="@string/information" >
         <Preference
             android:key="pref_google_plus"
-            android:summary="Tap here to follow yycode on Google+"
-            android:title="Follow on Google+" />
+            android:summary="@string/pref_google_plus_summary"
+            android:title="@string/pref_google_plus" />
         <Preference
             android:key="pref_donate_play"
-            android:summary="Tap here to donate by purchasing Donation Key"
-            android:title="Donate via Google Play" />
+            android:summary="@string/pref_donate_play_summary"
+            android:title="@string/pref_donate_play" />
         <Preference
             android:key="pref_donate_btc"
-            android:summary="Tap here to donate via Bitcoin"
-            android:title="Donate via Bitcoin" />
+            android:summary="@string/pref_donate_btc_summary"
+            android:title="@string/pref_donate_btc" />
     </PreferenceCategory>
 
 </PreferenceScreen>

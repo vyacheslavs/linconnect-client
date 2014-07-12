@@ -2,11 +2,11 @@
 
     <PreferenceCategory
         android:key="header_application"
-        android:title="Installed Applications" >
+        android:title="@string/header_application" >
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_all"
-            android:title="Check/uncheck all" />
+            android:title="@string/pref_all" />
     </PreferenceCategory>
 
 </PreferenceScreen>
