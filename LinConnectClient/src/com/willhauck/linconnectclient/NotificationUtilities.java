@@ -28,6 +28,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.widget.RemoteViews;
@@ -165,47 +167,64 @@ public class NotificationUtilities {
     @SuppressLint("DefaultLocale")
     public static ArrayList<String> getNotificationText(
             Notification notification) {
-        RemoteViews views = notification.contentView;
-        Class<?> secretClass = views.getClass();
 
-        try {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Bundle extras = notification.extras;
+
             ArrayList<String> notificationData = new ArrayList<String>();
 
-            Field outerFields[] = secretClass.getDeclaredFields();
-            for (int i = 0; i < outerFields.length; i++) {
-                if (!outerFields[i].getName().equals("mActions"))
-                    continue;
+            if (extras.getString("android.title") != null) notificationData.add(extras.getString("android.title"));
+            if (extras.getString("android.text") != null) notificationData.add(extras.getString("android.text"));
+            if (extras.getString("android.subText") != null) notificationData.add(extras.getString("android.subText"));
 
-                outerFields[i].setAccessible(true);
+            return notificationData;
+        }
+        else {
 
-                @SuppressWarnings("unchecked")
-                ArrayList<Object> actions = (ArrayList<Object>) outerFields[i]
-                        .get(views);
-                for (Object action : actions) {
-                    Field innerFields[] = action.getClass().getDeclaredFields();
+            RemoteViews views = notification.contentView;
+            Class<?> secretClass = views.getClass();
 
-                    Object value = null;
-                    for (Field field : innerFields) {
-                        field.setAccessible(true);
-                        // Value field could possibly contain text
-                        if (field.getName().equals("value")) {
-                            value = field.get(action);
+            try {
+                ArrayList<String> notificationData = new ArrayList<String>();
+
+                Field outerFields[] = secretClass.getDeclaredFields();
+                for (int i = 0; i < outerFields.length; i++) {
+                    if (!outerFields[i].getName().equals("mActions"))
+                        continue;
+
+                    outerFields[i].setAccessible(true);
+
+                    @SuppressWarnings("unchecked")
+                    ArrayList<Object> actions = (ArrayList<Object>) outerFields[i]
+                            .get(views);
+                    for (Object action : actions) {
+                        Field innerFields[] = action.getClass().getDeclaredFields();
+
+                        Object value = null;
+                        for (Field field : innerFields) {
+                            field.setAccessible(true);
+                            // Value field could possibly contain text
+                            if (field.getName().equals("value")) {
+                                value = field.get(action);
+                            }
+                        }
+
+                        // Check if value is a String
+                        if (value != null
+                                && value.getClass().getName().toUpperCase()
+                                .contains("STRING")) {
+
+                            notificationData.add(value.toString());
                         }
                     }
 
-                    // Check if value is a String
-                    if (value != null
-                            && value.getClass().getName().toUpperCase()
-                            .contains("STRING")) {
-
-                        notificationData.add(value.toString());
-                    }
+                    return notificationData;
                 }
-
-                return notificationData;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
         }
+
         return null;
     }
 }
