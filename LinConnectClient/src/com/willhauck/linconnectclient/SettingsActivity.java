@@ -65,8 +65,6 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceListener;
 
-import de.cketti.library.changelog.ChangeLog;
-
 @SuppressWarnings("deprecation")
 public class SettingsActivity extends PreferenceActivity {
 	private String jmDnsServiceType = "_linconnect._tcp.local.";
@@ -89,10 +87,6 @@ public class SettingsActivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// Show changelog if needed
-		ChangeLog cl = new ChangeLog(this);
-		if (cl.isFirstRun()) {
-			cl.getLogDialog().show();
-		}
 		mWifiManager = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
 	}
 
