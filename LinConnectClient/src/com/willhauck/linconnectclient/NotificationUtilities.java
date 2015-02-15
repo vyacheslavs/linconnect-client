@@ -173,9 +173,9 @@ public class NotificationUtilities {
 
             ArrayList<String> notificationData = new ArrayList<String>();
 
-            if (extras.getString("android.title") != null) notificationData.add(extras.getString("android.title"));
-            if (extras.getString("android.text") != null) notificationData.add(extras.getString("android.text"));
-            if (extras.getString("android.subText") != null) notificationData.add(extras.getString("android.subText"));
+            if (extras.get("android.title") != null) notificationData.add(extras.get("android.title").toString());
+            if (extras.get("android.text") != null) notificationData.add(extras.get("android.text").toString());
+            if (extras.get("android.subText") != null) notificationData.add(extras.get("android.subText").toString());
 
             return notificationData;
         }
