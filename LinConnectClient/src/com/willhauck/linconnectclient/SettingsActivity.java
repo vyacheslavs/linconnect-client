@@ -21,6 +21,7 @@ package com.willhauck.linconnectclient;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -458,8 +459,61 @@ public class SettingsActivity extends PreferenceActivity {
 
 				});
 
+		class ServerScanCancelTask extends AsyncTask<String, ServiceEvent, Boolean> {
+
+			ProgressDialog dialog;
+
+			@Override
+			protected void onPreExecute() {
+				dialog = new ProgressDialog(SettingsActivity.this);
+				dialog.setCancelable(false);
+				dialog.setMessage("Stopping server discovery ...");
+				dialog.show();
+			}
+
+			@Override
+			protected void onPostExecute(Boolean aBoolean) {
+				dialog.dismiss();
+			}
+
+			@Override
+			protected Boolean doInBackground(String... params) {
+
+				if (mMulticastLock != null)
+					mMulticastLock.release();
+				try {
+					mJmDNS.removeServiceListener(jmDnsServiceType, ServerListener);
+					mJmDNS.close();
+				} catch (Exception e) {
+				}
+
+				// Remove loading indicator, add refresh indicator if it
+				// isn't already there
+				if (findPreference("pref_loading") != null)
+					serverCategory
+							.removePreference(findPreference("pref_loading"));
+				if (findPreference("pref_refresh") == null)
+					serverCategory.addPreference(refreshPreference);
+
+				return true;
+			}
+		}
+
+		loadingPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+
+				new ServerScanCancelTask().execute();
+				return true;
+			}
+		});
+
 		// Start scanning for servers
-		new ServerScanTask().execute();
+		// new ServerScanTask().execute();
+
+		if (findPreference("pref_refresh") == null)
+			serverCategory.addPreference(refreshPreference);
+
 	}
 
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
