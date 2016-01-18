@@ -36,6 +36,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -43,7 +44,9 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -77,6 +80,9 @@ public class SettingsActivity extends PreferenceActivity {
 	private Handler serverFoundHandler;
 	private static SharedPreferences sharedPreferences;
 
+	boolean initialy_on = true;
+	boolean initialy_toggle = false;
+
 	// Preferences
 	Preference refreshPreference;
 	Preference loadingPreference;
@@ -88,7 +94,51 @@ public class SettingsActivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// Show changelog if needed
+		if (getIntent().getData() != null)
+			handleIntent(getIntent());
 		mWifiManager = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
+	}
+
+	protected void handleIntent(Intent intent) {
+		Log.d("linconnect", "new intent:" + intent.getData().toString());
+
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(SettingsActivity.this);
+
+		if (prefs == null) {
+			return;
+		}
+
+		PreferenceScreen screen = (PreferenceScreen) findPreference("pref_screen");
+
+		if (screen == null) {
+			initialy_on = intent.getData().toString().equals("content://on");
+			initialy_toggle = true;
+			return;
+		}
+
+		int pos = findPreference("pref_toggle").getOrder();
+
+		boolean b = prefs.getBoolean("pref_toggle", true);
+		boolean need_to_click = false;
+
+		if (intent.getData().toString().equals("content://on")) {
+			if (!b)
+				need_to_click = true;
+		} else if (intent.getData().toString().equals("content://off")) {
+			if (b)
+				need_to_click = true;
+		}
+
+		if (need_to_click)
+			screen.onItemClick( null, null, pos, 0 );
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		if (intent.getData()!=null)
+			handleIntent(intent);
 	}
 
 	@Override
@@ -129,6 +179,12 @@ public class SettingsActivity extends PreferenceActivity {
 
 		loadingPreference = ((Preference) findPreference("pref_loading"));
 		serverCategory.removePreference(loadingPreference);
+
+		CheckBoxPreference cb = ((CheckBoxPreference)findPreference("pref_toggle"));
+		if (initialy_toggle) {
+			Log.d("linconnect", "set checked on initially");
+			cb.setChecked(initialy_on);
+		}
 
 		Preference prefEnable = findPreference("pref_enable");
 		prefEnable
@@ -508,6 +564,8 @@ public class SettingsActivity extends PreferenceActivity {
 			}
 		});
 
+
+
 		// Start scanning for servers
 		// new ServerScanTask().execute();
 
@@ -515,7 +573,7 @@ public class SettingsActivity extends PreferenceActivity {
 			serverCategory.addPreference(refreshPreference);
 
 	}
-
+	
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object value) {

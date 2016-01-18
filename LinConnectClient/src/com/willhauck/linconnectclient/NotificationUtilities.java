@@ -32,6 +32,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import org.apache.http.HttpResponse;
@@ -42,6 +43,9 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -61,11 +65,15 @@ public class NotificationUtilities {
         NetworkInfo mWifi = connManager
                 .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
+
         // Check Wifi state, whether notifications are enabled globally, and
         // whether notifications are enabled for specific application
         if (prefs.getBoolean("pref_toggle", true)
                 && prefs.getBoolean(packageName, true) && mWifi.isConnected()) {
+
             String ip = prefs.getString("pref_ip", "0.0.0.0:9090");
+
+            Log.d("linconnect", "sending notification to " + ip);
 
             // Magically extract text from notification
             ArrayList<String> notificationData = NotificationUtilities
@@ -146,7 +154,10 @@ public class NotificationUtilities {
 
 
             // Send HTTP request
-            HttpClient client = new DefaultHttpClient();
+            final HttpParams httpParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 2000);
+            HttpConnectionParams.setSoTimeout(httpParams, 2000);
+            HttpClient client = new DefaultHttpClient(httpParams);
             HttpResponse response;
             try {
                 response = client.execute(post);
